@@ -10,7 +10,7 @@ COPY . $APPDIR/
 RUN go mod download
 RUN go mod verify
 
-RUN go build -ldflags "-s -w" -o /app $APPDIR/main.go
+RUN go build -ldflags "-s -w" -o /app $APPDIR/cmd/api/main.go
 
 FROM gcr.io/distroless/static
 
