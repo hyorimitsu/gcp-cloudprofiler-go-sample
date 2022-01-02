@@ -1,13 +1,19 @@
-FROM golang:1.14.2-alpine3.11 AS build-env
+FROM golang:1.17 as build-env
 
-ADD . /go/src/github.com/hyorimitsu/gcp-cloudprofiler-go-sample/src
-WORKDIR /go/src/github.com/hyorimitsu/gcp-cloudprofiler-go-sample/src
+ENV APPDIR=$GOPATH/src/github.com/hyorimitsu/hello-cloud-profiler/src \
+    CGO_ENABLED=0 \
+    GOOS=linux
 
-RUN go build .
+WORKDIR $APPDIR
+COPY . $APPDIR/
 
-FROM alpine:3.11
-COPY --from=build-env /go/src/github.com/hyorimitsu/gcp-cloudprofiler-go-sample/src/src /src
-ENV GOPATH=/go
-ENV APP_VERSION="1.0.0"
+RUN go mod download
+RUN go mod verify
 
-ENTRYPOINT [ "./src","--host", "0.0.0.0", "--port", "80", "--scheme", "http"]
+RUN go build -ldflags "-s -w" -o /app $APPDIR/main.go
+
+FROM gcr.io/distroless/static
+
+COPY --from=build-env /app /
+
+CMD ["/app"]
