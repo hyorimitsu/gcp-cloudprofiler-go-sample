@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-cloud-profiler-api
+  labels:
+    app: hello-cloud-profiler-api
+spec:
+  ports:
+    - port: 8081
+  selector:
+    app: hello-cloud-profiler-api
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-cloud-profiler-api
+  labels:
+    app: hello-cloud-profiler-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-cloud-profiler-api
+  template:
+    metadata:
+      labels:
+        app: hello-cloud-profiler-api
+    spec:
+      containers:
+        - name: hello-cloud-profiler-api
+          image: gcr.io/hello-cloud-profiler/app-api:1.0.0
+          ports:
+            - containerPort: 8081
+          env:
+            - name: PORT
+              value: "8081"
+            - name: RUNNING_ON_GCP
+              value: "true"
+            - name: SERVICE_VERSION
+              value: "1.0.0"
