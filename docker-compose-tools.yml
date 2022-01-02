@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  go-mod:
+    image: golang:1.17.5-alpine3.15
+    volumes:
+      - ${API_DIR}:${API_GOPATH}
+    working_dir: ${API_GOPATH}
+    command: go mod vendor
